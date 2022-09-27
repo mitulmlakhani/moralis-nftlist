@@ -19,23 +19,23 @@ function App() {
   const [totalNfts, setTotalNfts] = useState(0);
 
   const fetchTrans = async () => {
+    const NFT_URL =
+      process.env.REACT_APP_NFT_API_URL || "http://localhost:4000/nfts";
     const options = {
       method: "GET",
       headers: {
         Accept: "application/json",
-        "X-API-Key": process.env.REACT_APP_MORALIS_KEY,
       },
     };
 
     fetch(
-      `https://deep-index.moralis.io/api/v2/${address}/nft?chain=${chain.network}&format=decimal&limit=100&cursor=${cursor}`,
-      options
+      `${NFT_URL}?address=${address}&chain=${chain?.network || "bsc"}&cursor=${cursor}`, options
     )
       .then((response) => response.json())
       .then((response) => {
         setTotalNfts(response?.total || 0);
-        setCursor((response?.cursor ? response.cursor : ""));
-        setNfts([...nfts, ...(response?.result || [])]);
+        setCursor(response?.cursor ? response.cursor : "");
+        setNfts([...nfts, ...(response?.nfts || [])]);
       })
       .catch((err) => console.error(err));
   };
@@ -106,9 +106,13 @@ function App() {
           <div className="container">
             <ul className="image-gallery">
               {nfts.map((_token) => {
-                const metadata = _token?.metadata ? JSON.parse(_token.metadata) : {};
-                const imageUrl = setHttp((metadata?.image || "").replace("ipfs://", ""));
-                
+                const metadata = _token?.metadata
+                  ? JSON.parse(_token.metadata)
+                  : {};
+                const imageUrl = setHttp(
+                  (metadata?.image || "").replace("ipfs://", "")
+                );
+
                 return (
                   <li className="m-4">
                     <img
@@ -120,15 +124,23 @@ function App() {
                       alt={`${_token.name} #${_token.token_id}`}
                     />
                     <div className="overlay text-center">
-                      <span>{(metadata?.name || _token.name)} #{_token.token_id}</span>
+                      <span>
+                        {metadata?.name || _token.name} #{_token.token_id}
+                      </span>
                     </div>
                   </li>
                 );
               })}
             </ul>
 
-            {(cursor !== "") && (
-              <div style={{display: "flex", justifyContent: "center", margin: "2rem"}}>
+            {cursor !== "" && (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  margin: "2rem",
+                }}
+              >
                 <button onClick={() => fetchTrans()}>Load More</button>
               </div>
             )}
