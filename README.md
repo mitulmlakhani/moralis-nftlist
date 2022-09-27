@@ -1,10 +1,14 @@
-# Getting Started with Create React App
+# Getting Started with BNB NFT LIST App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Rename env.example to .env and add moralis key and update other env values as per your hosting. for local no need to update any env least moralis key.
 
 ## Available Scripts
 
 In the project directory, you can run:
+
+### `npm run server-dev`
+
+Will start node server in development mode with nodemon.
 
 ### `npm start`
 
